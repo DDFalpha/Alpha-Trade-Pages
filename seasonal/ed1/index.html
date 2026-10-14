@@ -47,6 +47,15 @@
   .alert a{color:inherit;font-weight:bold;margin-left:auto;white-space:nowrap}
   .newtag{display:inline-block;background:#c0392b;color:#fff;font-size:12px;font-weight:bold;letter-spacing:.04em;padding:3px 9px;border-radius:3px;vertical-align:middle;margin-left:8px}
   .posted{color:var(--ink3);font-size:13px}
+  .up{width:100%;border-collapse:collapse;font-size:15px}
+  .up td{vertical-align:top;padding:14px 12px;border-bottom:1px solid var(--rule)}
+  .up td:first-child{white-space:nowrap;width:150px}
+  .up .d{font-family:var(--serif);font-size:22px;line-height:1.1}
+  .up .rel{display:block;color:var(--ink3);font-size:13px;margin-top:3px}
+  .up .t{font-weight:bold} .up .mk{display:block;color:var(--ink3);font-size:13px}
+  .up .rec{white-space:nowrap} .up .rec b{display:block}
+  .up .note{color:var(--ink2);font-size:14px}
+  .ex{display:inline-block;background:#eee;color:#666;font-size:11px;font-weight:bold;letter-spacing:.06em;padding:2px 7px;border-radius:3px;margin-left:6px;vertical-align:middle}
   main .col{padding:44px 0 48px}
   h2{font-family:var(--serif);font-weight:normal;font-size:28px;line-height:1.2;margin:0 0 6px;color:var(--ink)}
   h3{font-family:var(--serif);font-weight:normal;font-size:23px;line-height:1.25;margin:0 0 4px}
@@ -154,6 +163,17 @@
       <tr><td><b>Sell NGM27 / Buy NGN27</b><span class="newtag">NEW</span><br><span class="mk">June/July 2027 natural gas</span></td><td><b>Oct 14</b></td><td>Oct 16, 2026 to Mar 12, 2027</td><td><span class="status pending" data-entry="2026-10-16" data-mode="pill">Enters Friday</span></td><td class="num">—</td></tr>
       <tr><td><b>Sell RBH27 / Buy RBJ27</b><br><span class="mk">March/April 2027 RBOB gasoline</span></td><td><span class="posted">Oct 7</span></td><td>Oct 9 to Oct 13, 2026</td><td><span class="status closed">Closed early</span></td><td class="num pos">+$407.40</td></tr>
       <tr><td><b>Sell ZLK27 / Buy ZLN27</b><br><span class="mk">May/July 2027 soybean oil</span></td><td><span class="posted">Sep 29</span></td><td>Sep 30, 2026 to Feb 17, 2027</td><td><span class="status open">Open</span></td><td class="num pos">+$42.00</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Watch List: Coming Up</h2>
+  <p class="lede">Seasonal spreads queued behind this week's trade, in entry order. Each one gets its full write-up when it becomes the featured trade.</p>
+  <div class="tablewrap"><table class="up">
+    <thead><tr><th>Entry</th><th>Trade</th><th>Window</th><th>20-year record</th><th>Why it's on the list</th></tr></thead>
+    <tbody>
+      <tr><td><span class="d">Oct 26</span><span class="rel" data-entry="2026-10-26" data-mode="rel"></span></td><td><span class="t">Sell LEG27 / Buy LEJ27</span><span class="mk">February/April 2027 live cattle · 1.00 = $400</span></td><td>Oct 26 to Dec 9</td><td class="rec"><b>95%, 19 of 20</b>avg +$432</td><td class="note">February has lost ground to April into early December in 19 of the last 20 years; the only miss was 2020 (−$400). Last five years 5 for 5. Spread −1.325 on Oct 14.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -318,7 +338,8 @@
     var longDate=DAYS[entry.getDay()]+', '+MON[entry.getMonth()]+' '+entry.getDate();
     var shortDate=MON[entry.getMonth()].slice(0,3)+' '+entry.getDate();
     var rel = d>1 ? 'in '+d+' days' : d===1 ? 'tomorrow' : d===0 ? 'today' : null;
-    if(mode==='long'){
+    if(mode==='rel'){ el.textContent = rel ? rel : 'entered'; }
+    else if(mode==='long'){
       el.textContent = rel ? 'entry '+longDate+' ('+rel+')' : 'entered '+longDate;
     } else if(mode==='pill'){
       if(d>1 && d<7) el.textContent='Enters '+DAYS[entry.getDay()]+' ('+d+' days)';

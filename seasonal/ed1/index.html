@@ -126,12 +126,12 @@
 <div class="alert band"><div class="col">
   <span class="dot" aria-hidden="true"></span>
   <b>New trade posted Wednesday, October 14</b>
-  <span>Sell NGM27 / Buy NGN27 &nbsp;·&nbsp; entry Friday, October 16 <span id="countdown"></span></span>
+  <span>Sell NGM27 / Buy NGN27 &nbsp;·&nbsp; <span data-entry="2026-10-16" data-mode="long">entry Friday, October 16</span></span>
   <a href="#ng">See the trade ↓</a>
 </div></div>
 
 <div class="hero band"><div class="col">
-  <p class="when">Posted October 14 &nbsp;·&nbsp; enters Friday, October 16</p>
+  <p class="when">Posted October 14 &nbsp;·&nbsp; <span data-entry="2026-10-16" data-mode="long">enters Friday, October 16</span></p>
   <h1>Sell June, buy July 2027 natural gas <span class="newtag">NEW</span></h1>
   <p>The June/July Henry Hub spread has finished the Oct 16 to Mar 12 window in the seller's favor in all 20 of the last 20 years, averaging $394 per spread. Margin is about $153 per spread, so the setup is cheap to carry; the drawdowns of the last two years are not, so size accordingly.</p>
   <a class="btn" href="#ng">Read the trade</a>
@@ -151,7 +151,7 @@
   <div class="tablewrap"><table class="sheet">
     <thead><tr><th>Trade</th><th>Posted</th><th>Window</th><th>Status</th><th class="num">Result</th></tr></thead>
     <tbody>
-      <tr><td><b>Sell NGM27 / Buy NGN27</b><span class="newtag">NEW</span><br><span class="mk">June/July 2027 natural gas</span></td><td><b>Oct 14</b></td><td>Oct 16, 2026 to Mar 12, 2027</td><td><span class="status pending">Enters Friday</span></td><td class="num">—</td></tr>
+      <tr><td><b>Sell NGM27 / Buy NGN27</b><span class="newtag">NEW</span><br><span class="mk">June/July 2027 natural gas</span></td><td><b>Oct 14</b></td><td>Oct 16, 2026 to Mar 12, 2027</td><td><span class="status pending" data-entry="2026-10-16" data-mode="pill">Enters Friday</span></td><td class="num">—</td></tr>
       <tr><td><b>Sell RBH27 / Buy RBJ27</b><br><span class="mk">March/April 2027 RBOB gasoline</span></td><td><span class="posted">Oct 7</span></td><td>Oct 9 to Oct 13, 2026</td><td><span class="status closed">Closed early</span></td><td class="num pos">+$407.40</td></tr>
       <tr><td><b>Sell ZLK27 / Buy ZLN27</b><br><span class="mk">May/July 2027 soybean oil</span></td><td><span class="posted">Sep 29</span></td><td>Sep 30, 2026 to Feb 17, 2027</td><td><span class="status open">Open</span></td><td class="num pos">+$42.00</td></tr>
     </tbody>
@@ -162,7 +162,7 @@
   <h2>The trades</h2>
 
   <article class="trade" id="ng">
-    <div class="top"><h3>Sell NGM27 / Buy NGN27 <span class="newtag">NEW · posted Oct 14</span></h3><span class="status pending">Enters Oct 16</span></div>
+    <div class="top"><h3>Sell NGM27 / Buy NGN27 <span class="newtag">NEW · posted Oct 14</span></h3><span class="status pending" data-entry="2026-10-16" data-mode="pill">Enters Oct 16</span></div>
     <p class="sub">June/July 2027 natural gas. Spread = NGM27 minus NGN27. One point is worth $10,000.</p>
     <div class="grid">
       <div>
@@ -308,8 +308,27 @@
   <p>Seasonal recommendations are for informational purposes only and do not constitute a solicitation to buy or sell futures or options. Futures and spread trading involve substantial risk of loss and are not suitable for all investors. Past performance of a seasonal pattern is not indicative of future results. This page is for current Alpha Trade members and is replaced with each edition. Questions: darin@lakefrontfutures.com</p>
 </div></footer>
 <script>
-(function(){var e=document.getElementById('countdown');if(!e)return;var entry=new Date(2026,9,16);var now=new Date();now.setHours(0,0,0,0);var d=Math.round((entry-now)/864e5);
-e.textContent=d>1?'(in '+d+' days)':d===1?'(tomorrow)':d===0?'(today)':'(entered '+(-d)+(d===-1?' day ago)':' days ago)');})();
+(function(){
+  var DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var MON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var now=new Date(); now.setHours(0,0,0,0);
+  document.querySelectorAll('[data-entry]').forEach(function(el){
+    var p=el.getAttribute('data-entry').split('-'); var entry=new Date(+p[0],+p[1]-1,+p[2]);
+    var d=Math.round((entry-now)/864e5); var mode=el.getAttribute('data-mode');
+    var longDate=DAYS[entry.getDay()]+', '+MON[entry.getMonth()]+' '+entry.getDate();
+    var shortDate=MON[entry.getMonth()].slice(0,3)+' '+entry.getDate();
+    var rel = d>1 ? 'in '+d+' days' : d===1 ? 'tomorrow' : d===0 ? 'today' : null;
+    if(mode==='long'){
+      el.textContent = rel ? 'entry '+longDate+' ('+rel+')' : 'entered '+longDate;
+    } else if(mode==='pill'){
+      if(d>1 && d<7) el.textContent='Enters '+DAYS[entry.getDay()]+' ('+d+' days)';
+      else if(d>=7) el.textContent='Enters '+shortDate;
+      else if(d===1) el.textContent='Enters tomorrow';
+      else if(d===0) el.textContent='Enters today';
+      else { el.textContent='Open'; el.className='status open'; }
+    }
+  });
+})();
 </script>
 </body>
 </html>

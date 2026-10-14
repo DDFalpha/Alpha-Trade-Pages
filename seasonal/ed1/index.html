@@ -56,6 +56,14 @@
   .up .rec{white-space:nowrap} .up .rec b{display:block}
   .up .note{color:var(--ink2);font-size:14px}
   .ex{display:inline-block;background:#eee;color:#666;font-size:11px;font-weight:bold;letter-spacing:.06em;padding:2px 7px;border-radius:3px;margin-left:6px;vertical-align:middle}
+  .chartbtn{display:inline-block;margin-top:8px;padding:6px 12px;border:1.5px solid var(--green-dk);color:var(--green-dk);background:#fff;border-radius:4px;font-size:13px;font-weight:bold;cursor:pointer;font-family:var(--sans);text-decoration:none}
+  .chartbtn:hover{background:var(--green-dk);color:#fff}
+  .chartbtn::before{content:"";display:inline-block;width:10px;height:10px;margin-right:7px;vertical-align:-1px;background:linear-gradient(to top right,transparent 46%,currentColor 46%,currentColor 54%,transparent 54%)}
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .lightbox.on{display:flex}
+  .lightbox img{max-width:100%;max-height:92vh;width:auto;height:auto;display:block;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+  .lightbox .x{position:absolute;top:14px;right:18px;color:#fff;font-size:30px;line-height:1;background:none;border:0;cursor:pointer;font-family:var(--sans)}
+  .lightbox .hint{position:absolute;bottom:14px;left:0;right:0;text-align:center;color:#9aa;font-size:13px}
   main .col{padding:44px 0 48px}
   h2{font-family:var(--serif);font-weight:normal;font-size:28px;line-height:1.2;margin:0 0 6px;color:var(--ink)}
   h3{font-family:var(--serif);font-weight:normal;font-size:23px;line-height:1.25;margin:0 0 4px}
@@ -173,8 +181,8 @@
   <div class="tablewrap"><table class="up">
     <thead><tr><th>Entry</th><th>Trade</th><th>Window</th><th>20-year record</th><th>Why it's on the list</th></tr></thead>
     <tbody>
-      <tr><td><span class="d">Oct 26</span><span class="rel" data-entry="2026-10-26" data-mode="rel"></span></td><td><span class="t">Sell LEG27 / Buy LEJ27</span><span class="mk">February/April 2027 live cattle · 1.00 = $400</span></td><td>Oct 26 to Dec 9</td><td class="rec"><b>95%, 19 of 20</b>avg +$432</td><td class="note">February has lost ground to April into early December in 19 of the last 20 years; the only miss was 2020 (−$400). Last five years 5 for 5. Spread −1.325 on Oct 14.</td></tr>
-      <tr><td><span class="d">Oct 26</span><span class="rel" data-entry="2026-10-26" data-mode="rel"></span></td><td><span class="t">Sell CLG27 / Buy CLJ27</span><span class="mk">February/April 2027 crude oil · 1.00 = $1,000</span></td><td>Oct 26 to Nov 13</td><td class="rec"><b>95%, 19 of 20</b>avg +$295</td><td class="note">Short three-week window: 15 straight winners through the last 15 years, one loss in 20 (2011, −$80). Two flat years count as wins in that record. Spread 2.68 on Oct 14.</td></tr>
+      <tr><td><span class="d">Oct 26</span><span class="rel" data-entry="2026-10-26" data-mode="rel"></span></td><td><span class="t">Sell LEG27 / Buy LEJ27</span><span class="mk">February/April 2027 live cattle · 1.00 = $400</span><a class="chartbtn" href="charts/LEG27-LEJ27.png" data-chart>View chart</a></td><td>Oct 26 to Dec 9</td><td class="rec"><b>95%, 19 of 20</b>avg +$432</td><td class="note">February has lost ground to April into early December in 19 of the last 20 years; the only miss was 2020 (−$400). Last five years 5 for 5. Spread −1.325 on Oct 14.</td></tr>
+      <tr><td><span class="d">Oct 26</span><span class="rel" data-entry="2026-10-26" data-mode="rel"></span></td><td><span class="t">Sell CLG27 / Buy CLJ27</span><span class="mk">February/April 2027 crude oil · 1.00 = $1,000</span><a class="chartbtn" href="charts/CLG27-CLJ27.png" data-chart>View chart</a></td><td>Oct 26 to Nov 13</td><td class="rec"><b>95%, 19 of 20</b>avg +$295</td><td class="note">Short three-week window: 15 straight winners through the last 15 years, one loss in 20 (2011, −$80). Two flat years count as wins in that record. Spread 2.68 on Oct 14.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -324,11 +332,21 @@
 
 </div></main>
 
+<div class="lightbox" id="lb" role="dialog" aria-label="Seasonal chart"><button class="x" id="lbx" aria-label="Close">×</button><img id="lbimg" alt="Alpha Trade seasonal chart"><div class="hint">Tap outside the chart to close · pinch to zoom on a phone</div></div>
+
 <footer class="band"><div class="col">
   <b>Alpha Trade</b>
   <p>Seasonal recommendations are for informational purposes only and do not constitute a solicitation to buy or sell futures or options. Futures and spread trading involve substantial risk of loss and are not suitable for all investors. Past performance of a seasonal pattern is not indicative of future results. This page is for current Alpha Trade members and is replaced with each edition. Questions: darin@lakefrontfutures.com</p>
 </div></footer>
 <script>
+(function(){
+  var lb=document.getElementById('lb'),img=document.getElementById('lbimg');
+  document.querySelectorAll('[data-chart]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();img.src=a.getAttribute('href');lb.classList.add('on');});});
+  function close(){lb.classList.remove('on');img.src='';}
+  lb.addEventListener('click',function(e){if(e.target!==img)close();});
+  document.getElementById('lbx').addEventListener('click',close);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+})();
 (function(){
   var DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   var MON=['January','February','March','April','May','June','July','August','September','October','November','December'];

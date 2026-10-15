@@ -4,6 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alpha Crop Watch | Alpha Trade</title>
+<meta name="description" content="CONAB vs USDA crop numbers side by side, from Alpha Trade.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alpha Trade">
+<meta property="og:title" content="Click here to view the CONAB / USDA numbers">
+<meta property="og:description" content="Alpha Crop Watch: CONAB vs USDA WASDE, side by side. Soybeans, corn and your own crop scenarios.">
+<meta property="og:url" content="https://ddfalpha.github.io/Alpha-Trade-Pages/alpha-crop-watch.html">
+<meta property="og:image" content="https://ddfalpha.github.io/Alpha-Trade-Pages/alpha-crop-watch-click-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Click here to view the CONAB / USDA numbers">
+<meta name="twitter:description" content="Alpha Crop Watch: CONAB vs USDA WASDE, side by side.">
+<meta name="twitter:image" content="https://ddfalpha.github.io/Alpha-Trade-Pages/alpha-crop-watch-click-image.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 /* ================= ALPHA TRADE NIGHT THEME (brand colors from the logo) =================
@@ -65,6 +78,9 @@ header .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
 .kpi .val small{font-size:14px;color:var(--hero-sub)}
 .kpi .chg{font-size:13px}
 .kpi .vs{font-size:13px;color:var(--hero-ink);margin-top:4px}
+.kpi .kmt{font-size:12px;color:var(--hero-sub);margin:-2px 0 4px}
+.mt{display:block;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:var(--muted);margin-top:2px}
+.bu-u{font-size:12px;color:var(--muted)}
 .tag-up{color:var(--hero-up)}.tag-dn{color:var(--hero-dn)}.tag-flat{color:var(--hero-sub)}
 .card .tag-up,.chip .tag-up{color:var(--up)} .card .tag-dn,.chip .tag-dn{color:var(--down)} .card .tag-flat{color:var(--muted)}
 
@@ -219,6 +235,30 @@ const WASDE_DATA = {
   us_soy:  { "Sep": { yield: 52.8, prod: 4535, crush: 2780, exports: 1685, end: 310, price: 12.00 },
              "Oct": { yield: 53.1, prod: 4562, crush: 2780, exports: 1695, end: 315, price: 12.00 } },
 
+  // U.S. balance sheets (million acres / bu per acre / million bushels / $ per bu)
+  // columns: [2025/26 est, 2026/27 Sep, 2026/27 Oct]
+  us_balance: {
+    corn: [
+      ["Planted (M ac)","ac",98.7,96.8,96.8], ["Harvested (M ac)","ac",90.9,88.5,88.5], ["Yield (bu/ac)","yld",186.5,178.5,181.2],
+      ["Beginning stocks","bu",1551,1922,2095], ["Production","bu",16964,15800,16034], ["Imports","bu",31,25,25], ["Total supply","bu",18546,17747,18154],
+      ["Feed & residual","bu",6119,5950,6000], ["Food, seed & industrial","bu",6903,6955,7005], ["  Ethanol","bu",5547,5600,5650],
+      ["Domestic total","bu",13022,12905,13005], ["Exports","bu",3429,3275,3300], ["Total use","bu",16451,16180,16305],
+      ["Ending stocks","bu",2095,1567,1849], ["Season-avg price","px",4.16,4.80,4.70]
+    ],
+    soy: [
+      ["Planted (M ac)","ac",81.2,86.9,86.9], ["Harvested (M ac)","ac",80.4,85.9,85.9], ["Yield (bu/ac)","yld",53.0,52.8,53.1],
+      ["Beginning stocks","bu",325,325,315], ["Production","bu",4261,4535,4562], ["Imports","bu",22,25,25], ["Total supply","bu",4608,4885,4902],
+      ["Crush","bu",2646,2780,2780], ["Exports","bu",1515,1685,1695], ["Seed","bu",75,73,73], ["Residual","bu",57,38,39],
+      ["Total use","bu",4293,4575,4587], ["Ending stocks","bu",315,310,315], ["Season-avg price","px",10.50,12.00,12.00]
+    ],
+    wheat: [
+      ["Planted (M ac)","ac",45.5,42.7,42.5], ["Harvested (M ac)","ac",37.3,32.1,31.9], ["Yield (bu/ac)","yld",53.3,47.8,48.1],
+      ["Beginning stocks","bu",855,920,920], ["Production","bu",1989,1531,1534], ["Imports","bu",125,140,145], ["Total supply","bu",2969,2591,2599],
+      ["Food","bu",959,960,960], ["Seed","bu",58,59,59], ["Feed & residual","bu",124,80,90], ["Domestic total","bu",1141,1099,1109],
+      ["Exports","bu",908,775,750], ["Total use","bu",2049,1874,1859], ["Ending stocks","bu",920,717,740], ["Season-avg price","px",5.06,6.40,6.30]
+    ]
+  },
+
   // World ending stocks, MMT
   world: { soy_end: { "Sep": 124.02, "Oct": 124.28 }, corn_end: { "Sep": 272.10, "Oct": 280.44 } },
 
@@ -237,8 +277,8 @@ const WASDE_DATA = {
 </div></header>
 
 <nav class="switch" aria-label="Data source"><div class="wrap" role="tablist">
-  <button role="tab" data-view="conab"><span class="dot c"></span>CONAB</button>
-  <button role="tab" data-view="wasde"><span class="dot u"></span>USDA WASDE</button>
+  <button role="tab" data-view="conab"><span class="dot c"></span>Brazil (CONAB)</button>
+  <button role="tab" data-view="wasde"><span class="dot u"></span>USDA (U.S.)</button>
   <button role="tab" data-view="compare"><span class="dot b"></span>Side‑by‑Side</button>
 </div></nav>
 
@@ -285,28 +325,29 @@ const WASDE_DATA = {
     </div>
     <div class="grid2">
       <div class="card">
-        <h2>Brazil Soybeans — USDA Balance Sheet</h2>
-        <p class="note">MMT. USDA local year (Oct–Sep).</p>
-        <div class="tblwrap"><table id="wSoy"></table></div>
+        <h2>U.S. Corn — USDA Balance Sheet</h2>
+        <p class="note">Million bushels and bu/acre, metric tons in small print. Marketing year Sep–Aug.</p>
+        <div class="tblwrap"><table id="usCorn"></table></div>
       </div>
       <div class="card">
-        <h2>Brazil Corn — USDA Balance Sheet</h2>
-        <p class="note">MMT. USDA local year (Oct–Sep).</p>
-        <div class="tblwrap"><table id="wCorn"></table></div>
+        <h2>U.S. Soybeans — USDA Balance Sheet</h2>
+        <p class="note">Million bushels and bu/acre, metric tons in small print. Marketing year Sep–Aug.</p>
+        <div class="tblwrap"><table id="usSoy"></table></div>
       </div>
     </div>
     <div class="grid2">
       <div class="card">
-        <h2>U.S. &amp; World Context</h2>
-        <p class="note">The rest of this month's WASDE, for perspective.</p>
-        <div class="tblwrap"><table id="wUS"></table></div>
+        <h2>U.S. Wheat — USDA Balance Sheet</h2>
+        <p class="note">Million bushels and bu/acre, metric tons in small print. Marketing year Jun–May.</p>
+        <div class="tblwrap"><table id="usWheat"></table></div>
       </div>
       <div class="card">
         <h2>Big Three Exporters, 2026/27</h2>
         <div class="seg" id="expSeg"><button data-k="soy" aria-pressed="true">Soybeans</button><button data-k="corn" aria-pressed="false">Corn</button></div>
         <p class="note">USDA production vs exports, MMT.</p>
         <canvas id="expChart" height="210"></canvas>
-        <div class="tblwrap" style="margin-top:10px"><table id="wProducts"></table></div>
+        <h2 style="margin-top:18px;font-size:18px">World Ending Stocks</h2>
+        <div class="tblwrap"><table id="wWorld"></table></div>
       </div>
     </div>
   </section>
@@ -314,14 +355,14 @@ const WASDE_DATA = {
   <!-- ===================== SIDE-BY-SIDE VIEW ===================== -->
   <section class="view" id="v-compare">
     <div class="card">
-      <h2>CONAB vs USDA, Side by Side</h2>
+      <h2>Brazil's Crop: CONAB vs USDA, Side by Side</h2>
       <p class="note" id="sbsNote"></p>
       <div class="tblwrap"><table class="sbs" id="sbsTable"></table></div>
       <p class="hint" style="margin-top:10px">Marketing years differ: USDA runs Brazil on Oct–Sep; CONAB runs soybeans Jan–Dec and corn Feb–Jan. Stocks and trade won't line up exactly — production is the clean comparison. CONAB corn beginning stocks = its projected stocks at Feb 2027.</p>
     </div>
     <div class="grid2">
       <div class="card">
-        <h2>Production: CONAB vs USDA vs Your Scenario</h2>
+        <h2>Brazil Production: CONAB vs USDA vs Your Scenario</h2>
         <p class="note">Scenario bars move with the Crop Scenario Lab below.</p>
         <canvas id="cmpChart" height="230"></canvas>
       </div>
@@ -333,8 +374,8 @@ const WASDE_DATA = {
     </div>
   </section>
 
-  <!-- ===================== SHARED TOOL (all views) ===================== -->
-  <div class="card">
+  <!-- ===================== SCENARIO LAB (Brazil + Side-by-Side tabs) ===================== -->
+  <div class="card" id="scenCard">
     <h2>Crop Scenario Lab</h2>
     <p class="note">Start at CONAB's numbers and stress the crop. Gaps are shown vs CONAB and vs USDA.</p>
     <div class="grid2">
@@ -376,6 +417,9 @@ const fmt = (n,d=1) => n==null||isNaN(n) ? '<span class="na">n/r</span>' : n.toL
 const sgn = (n,d=1) => { const r = Number(n.toFixed(d)); return (r>0?'+':'') + (r===0?(0).toFixed(d):r.toFixed(d)); };
 const pct = (n,lbl='y/y') => n==null ? '' : `<span class="${n>0?'tag-up':n<0?'tag-dn':'tag-flat'}">${n>0?'▲':n<0?'▼':'■'} ${Math.abs(n).toFixed(1)}% ${lbl}</span>`;
 const chgCell = (a,b,d=2) => { if(a==null||b==null) return '<td><span class="na">—</span></td>'; const g=a-b; const r=Number(g.toFixed(d)); return `<td class="${r>0?'pos':r<0?'neg':''}">${r===0?'unch':sgn(g,d)}</td>`; };
+const BU_T = { soy: 36.7437, corn: 39.3679 };
+const buB = (mmt,crop) => mmt*BU_T[crop]/1000;   // billion bushels
+const buHTML = (mmt,crop,d=2) => mmt==null ? fmt(null) : `${buB(mmt,crop).toFixed(2)} <span class="bu-u">B bu</span><span class="mt">${fmt(mmt,d)} MMT</span>`;
 const dateTxt = s => new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
 const shortDate = s => new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
 
@@ -389,11 +433,14 @@ $('pillSurvey').textContent = `CONAB ${D.survey} · ${W.report}`;
 $('srcSurvey').textContent = `${D.survey} Safra de Grãos ${D.crop_year}, ${dateTxt(D.release_date)}`;
 $('srcUsda').textContent = `${W.report}, ${dateTxt(W.release_date)}`;
 
+const UC = W.us_corn, US = W.us_soy, Wc = W.curr_label, Wp = W.prev_label;
+const MT_PER_MBU = { corn: 0.025401, soy: 0.027216, wheat: 0.027216 };   // million bu -> MMT
+const THA_PER_BPA = { corn: 0.06277, soy: 0.06725, wheat: 0.06725 };     // bu/ac -> t/ha
 // ---------------- HERO per view ----------------
-const kpiHTML = arr => arr.map(([l,v,u,c,vs,k]) => `<div class="kpi ${k||''}"><div class="lbl">${l}</div><div class="val">${v} <small>${u}</small></div><div class="chg">${c||''}</div><div class="vs">${vs||''}</div></div>`).join('');
+const kpiHTML = arr => arr.map(([l,v,u,c,vs,k,mt]) => `<div class="kpi ${k||''}"><div class="lbl">${l}</div><div class="val">${v} <small>${u}</small></div>${mt?`<div class="kmt">${mt}</div>`:''}<div class="chg">${c||''}</div><div class="vs">${vs||''}</div></div>`).join('');
 const HERO = {
   conab: () => ({
-    cls:'', title:`CONAB ${D.crop_year} — ${D.survey}`,
+    cls:'', title:`Brazil — CONAB ${D.crop_year} ${D.survey}`,
     sub:`Released ${dateTxt(D.release_date)} · Alpha Crop Watch`,
     kpis:[
       ['Soybean crop', fmt(D.soy.prod), 'MMT', pct(D.soy.prod_chg_pct), `Area ${D.soy.area} M ha (${sgn(D.soy.area_chg_pct)}%)`],
@@ -402,22 +449,22 @@ const HERO = {
       ['Total grains', fmt(D.total_grains.prod), 'MMT', pct(D.total_grains.prod_chg_pct), `Area ${D.total_grains.area} M ha (${sgn(D.total_grains.area_chg_pct)}%)`]
     ]}),
   wasde: () => ({
-    cls:'usda', title:`USDA ${W.report}`,
+    cls:'usda', title:`USDA ${W.report} — U.S. Crops`,
     sub:`Released ${dateTxt(W.release_date)} · Next WASDE ${dateTxt(W.next_release)}`,
     kpis:[
-      ['Brazil soybeans', fmt(WO.prod), 'MMT', pct((WO.prod/WP.prod-1)*100), `vs ${W.prev_label}: <b>${WO.prod===WS.prod?'unch':sgn(WO.prod-WS.prod)}</b>`],
-      ['Brazil corn', fmt(CO.prod), 'MMT', pct((CO.prod/CP.prod-1)*100), `vs ${W.prev_label}: <b>${CO.prod===CS.prod?'unch':sgn(CO.prod-CS.prod)}</b>`],
-      ['Brazil soy exports', fmt(WO.exports), 'MMT', pct((WO.exports/WP.exports-1)*100), `Ending stocks ${WO.end.toFixed(2)}`],
-      ['World soy stocks', fmt(W.world.soy_end[W.curr_label],2), 'MMT', '', `vs ${W.prev_label}: <b>${sgn(W.world.soy_end[W.curr_label]-W.world.soy_end[W.prev_label],2)}</b>`]
+      ['U.S. corn crop', (UC[Wc].prod/1000).toFixed(2), 'B bu', '', `vs ${Wp}: <b>${sgn(UC[Wc].prod-UC[Wp].prod,0)} M bu</b>`, '', `${(UC[Wc].prod*MT_PER_MBU.corn).toFixed(1)} MMT`],
+      ['U.S. corn yield', UC[Wc].yield.toFixed(1), 'bu/ac', '', `vs ${Wp}: <b>${sgn(UC[Wc].yield-UC[Wp].yield)}</b>`, '', `${(UC[Wc].yield*THA_PER_BPA.corn).toFixed(2)} t/ha`],
+      ['U.S. soybean crop', (US[Wc].prod/1000).toFixed(2), 'B bu', '', `vs ${Wp}: <b>${sgn(US[Wc].prod-US[Wp].prod,0)} M bu</b>`, '', `${(US[Wc].prod*MT_PER_MBU.soy).toFixed(1)} MMT`],
+      ['U.S. soybean yield', US[Wc].yield.toFixed(1), 'bu/ac', '', `vs ${Wp}: <b>${sgn(US[Wc].yield-US[Wp].yield)}</b>`, '', `${(US[Wc].yield*THA_PER_BPA.soy).toFixed(2)} t/ha`]
     ]}),
   compare: () => ({
-    cls:'cmp', title:`CONAB vs USDA — ${D.crop_year}`,
+    cls:'cmp', title:`CONAB vs USDA — Brazil crop estimates ${D.crop_year}`,
     sub:`CONAB ${D.survey} (${shortDate(D.release_date)}) vs USDA ${W.report} (${shortDate(W.release_date)})`,
     kpis:[
-      ['Soy: CONAB', fmt(D.soy.prod), 'MMT', '', `USDA ${WO.prod.toFixed(1)} · gap <b>${sgn(soyGap)}</b>`,'c'],
-      ['Soy: USDA', fmt(WO.prod), 'MMT', '', `${Math.abs(soyGap).toFixed(1)} MMT ${soyGap<0?'above':'below'} CONAB`,'u'],
-      ['Corn: CONAB', fmt(D.corn.prod), 'MMT', '', `USDA ${CO.prod.toFixed(1)} · gap <b>${sgn(cornGap)}</b>`,'c'],
-      ['Corn: USDA', fmt(CO.prod), 'MMT', '', `${Math.abs(cornGap).toFixed(1)} MMT ${cornGap<0?'above':'below'} CONAB`,'u']
+      ['Brazil soy: CONAB', fmt(D.soy.prod), 'MMT', '', `USDA ${WO.prod.toFixed(1)} · gap <b>${sgn(soyGap)}</b>`,'c'],
+      ['Brazil soy: USDA est.', fmt(WO.prod), 'MMT', '', `${Math.abs(soyGap).toFixed(1)} MMT ${soyGap<0?'above':'below'} CONAB`,'u'],
+      ['Brazil corn: CONAB', fmt(D.corn.prod), 'MMT', '', `USDA ${CO.prod.toFixed(1)} · gap <b>${sgn(cornGap)}</b>`,'c'],
+      ['Brazil corn: USDA est.', fmt(CO.prod), 'MMT', '', `${Math.abs(cornGap).toFixed(1)} MMT ${cornGap<0?'above':'below'} CONAB`,'u']
     ]})
 };
 
@@ -458,50 +505,28 @@ $('chips').innerHTML = [
 ].join('');
 
 // ---------------- WASDE VIEW ----------------
-const UC = W.us_corn, US = W.us_soy, Wc = W.curr_label, Wp = W.prev_label;
 $('takeWasde').innerHTML =
-  `USDA left Brazil's ${D.crop_year} crops ${WO.prod===WS.prod && CO.prod===CS.prod ? '<b>unchanged</b>' : 'revised'} at <b>${WO.prod.toFixed(1)} MMT</b> soybeans and <b>${CO.prod.toFixed(1)} MMT</b> corn; ` +
-  `Brazil soy ending stocks moved ${sgn(WO.end-WS.end,2)} to ${WO.end.toFixed(2)} on higher beginning stocks and imports. ` +
-  `The action was in the U.S.: corn yield ${sgn(UC[Wc].yield-UC[Wp].yield)} to <b>${UC[Wc].yield} bpa</b>, production ${(UC[Wc].prod/1000).toFixed(2)} bbu, ending stocks ${sgn(UC[Wc].end-UC[Wp].end,0)} mbu to <b>${UC[Wc].end.toLocaleString()}</b>. ` +
-  `Soybean yield ${US[Wc].yield} bpa, ending stocks ${US[Wc].end} mbu. World corn stocks ${sgn(W.world.corn_end[Wc]-W.world.corn_end[Wp])} MMT to ${W.world.corn_end[Wc].toFixed(1)}.`;
+  `U.S. corn: yield ${sgn(UC[Wc].yield-UC[Wp].yield)} to <b>${UC[Wc].yield} bu/ac</b>, production <b>${(UC[Wc].prod/1000).toFixed(2)} billion bu</b>, exports ${sgn(UC[Wc].exports-UC[Wp].exports,0)} M bu, ending stocks ${sgn(UC[Wc].end-UC[Wp].end,0)} to <b>${UC[Wc].end.toLocaleString()} M bu</b>; season-average price $${UC[Wc].price.toFixed(2)}. ` +
+  `U.S. soybeans: yield ${sgn(US[Wc].yield-US[Wp].yield)} to <b>${US[Wc].yield} bu/ac</b>, production <b>${(US[Wc].prod/1000).toFixed(2)} billion bu</b>, exports ${sgn(US[Wc].exports-US[Wp].exports,0)} M bu, ending stocks <b>${US[Wc].end} M bu</b>; price $${US[Wc].price.toFixed(2)}. ` +
+  `World corn stocks ${sgn(W.world.corn_end[Wc]-W.world.corn_end[Wp])} MMT to ${W.world.corn_end[Wc].toFixed(1)}.`;
 
-function balance(id, B, rows){
-  const P = B[W.prior_year_label], S = B[W.prev_label], O = B[W.curr_label];
-  $(id).innerHTML = `<tr><th></th><th>${W.prior_year_label}</th><th>26/27 ${W.prev_label}</th><th>26/27 ${W.curr_label}</th><th>Chg m/m</th></tr>` +
-    rows.map(([k,l]) => `<tr><td>${l}</td><td>${fmt(P[k],2)}</td><td>${fmt(S[k],2)}</td><td><b>${fmt(O[k],2)}</b></td>${chgCell(O[k],S[k])}</tr>`).join('');
+function usBalance(id, rows, crop){
+  const unit = (t,v) => t==='bu' ? `${v.toLocaleString('en-US')}<span class="mt">${(v*MT_PER_MBU[crop]).toFixed(2)} MMT</span>`
+                    : t==='yld' ? `${v.toFixed(1)}<span class="mt">${(v*THA_PER_BPA[crop]).toFixed(2)} t/ha</span>`
+                    : t==='px' ? `$${v.toFixed(2)}` : v.toFixed(1);
+  const chg = (t,a,b) => { const d=a-b, r=Number(d.toFixed(t==='bu'?0:2)); return `<td class="${r>0?'pos':r<0?'neg':''}">${r===0?'unch':(t==='px'?(r>0?'+$':'−$')+Math.abs(r).toFixed(2):sgn(d,t==='bu'?0:1))}</td>`; };
+  $(id).innerHTML = `<tr><th></th><th>${W.prior_year_label}</th><th>26/27 ${Wp}</th><th>26/27 ${Wc}</th><th>Chg m/m</th></tr>` +
+    rows.map(([l,t,a,b,c]) => `<tr${/Production|Ending stocks|Yield/.test(l)?' style="font-weight:700"':''}><td>${l.trim()===l?l:'&nbsp;&nbsp;'+l.trim()}</td><td>${unit(t,a)}</td><td>${unit(t,b)}</td><td><b>${unit(t,c)}</b></td>${chg(t,c,b)}</tr>`).join('');
 }
-balance('wSoy', W.brazil_soy, [['beg','Beginning stocks'],['prod','Production'],['imports','Imports'],['crush','Crush'],['dom','Domestic total'],['exports','Exports'],['end','Ending stocks']]);
-balance('wCorn', W.brazil_corn, [['beg','Beginning stocks'],['prod','Production'],['imports','Imports'],['feed','Feed use'],['dom','Domestic total'],['exports','Exports'],['end','Ending stocks']]);
-
-const usRows = [
-  ['g','U.S. corn'],
-  ['Yield (bpa)', UC[Wp].yield, UC[Wc].yield, 1],
-  ['Production (mbu)', UC[Wp].prod, UC[Wc].prod, 0],
-  ['Exports (mbu)', UC[Wp].exports, UC[Wc].exports, 0],
-  ['Ending stocks (mbu)', UC[Wp].end, UC[Wc].end, 0],
-  ['Season-avg price ($/bu)', UC[Wp].price, UC[Wc].price, 2],
-  ['g','U.S. soybeans'],
-  ['Yield (bpa)', US[Wp].yield, US[Wc].yield, 1],
-  ['Production (mbu)', US[Wp].prod, US[Wc].prod, 0],
-  ['Crush (mbu)', US[Wp].crush, US[Wc].crush, 0],
-  ['Exports (mbu)', US[Wp].exports, US[Wc].exports, 0],
-  ['Ending stocks (mbu)', US[Wp].end, US[Wc].end, 0],
-  ['Season-avg price ($/bu)', US[Wp].price, US[Wc].price, 2],
-  ['g','World ending stocks (MMT)'],
-  ['Soybeans', W.world.soy_end[Wp], W.world.soy_end[Wc], 2],
-  ['Corn', W.world.corn_end[Wp], W.world.corn_end[Wc], 2]
-];
-$('wUS').innerHTML = `<tr><th></th><th>${Wp}</th><th>${Wc}</th><th>Chg</th></tr>` + usRows.map(r =>
-  r[0]==='g' ? `<tr class="grp"><td colspan="4">${r[1]}</td></tr>` :
-  `<tr><td>${r[0]}</td><td>${fmt(r[1],r[3])}</td><td><b>${fmt(r[2],r[3])}</b></td>${chgCell(r[2],r[1],r[3])}</tr>`).join('');
-
-const M = W.brazil_meal, O2 = W.brazil_oil;
-$('wProducts').innerHTML = '<tr><th>Brazil products, 26/27</th><th>Prod</th><th>Domestic</th><th>Exports</th><th>End</th></tr>' +
-  `<tr><td>Soybean meal</td><td>${fmt(M.prod,2)}</td><td>${fmt(M.dom,2)}</td><td>${fmt(M.exports,2)}</td><td>${fmt(M.end,2)}</td></tr>` +
-  `<tr><td>Soybean oil</td><td>${fmt(O2.prod,2)}</td><td>${fmt(O2.dom,2)}</td><td>${fmt(O2.exports,2)}</td><td>${fmt(O2.end,2)}</td></tr>`;
+usBalance('usCorn', W.us_balance.corn, 'corn');
+usBalance('usSoy', W.us_balance.soy, 'soy');
+usBalance('usWheat', W.us_balance.wheat, 'wheat');
+$('wWorld').innerHTML = `<tr><th></th><th>${Wp}</th><th>${Wc}</th><th>Chg</th></tr>` +
+  [['Soybeans', W.world.soy_end], ['Corn', W.world.corn_end]].map(([n,o]) => `<tr><td>${n} (MMT)</td><td>${fmt(o[Wp],2)}</td><td><b>${fmt(o[Wc],2)}</b></td>${chgCell(o[Wc],o[Wp])}</tr>`).join('');
+const M = W.brazil_meal;
 
 // ---------------- SIDE-BY-SIDE ----------------
-$('sbsNote').innerHTML = `<span class="src c">CONAB</span>${D.survey}, ${dateTxt(D.release_date)} &nbsp; <span class="src u">USDA</span>${W.report}, ${dateTxt(W.release_date)} &nbsp;·&nbsp; MMT. Gap = CONAB − USDA.`;
+$('sbsNote').innerHTML = `<span class="src c">CONAB</span>${D.survey}, ${dateTxt(D.release_date)} &nbsp; <span class="src u">USDA</span>${W.report}, ${dateTxt(W.release_date)} &nbsp;·&nbsp; Million metric tons. Gap = CONAB − USDA.`;
 const sRows = [
   ['g','Soybeans'],
   ['Beginning stocks', D.soy.beginning_stocks, WO.beg],
@@ -517,9 +542,9 @@ const sRows = [
   ['Ending stocks', D.corn.ending_stocks, CO.end]
 ];
 const maxGap = Math.max(...sRows.filter(r=>r[0]!=='g'&&r[1]!=null&&r[2]!=null).map(r=>Math.abs(r[1]-r[2])), 1);
-$('sbsTable').innerHTML = '<tr><th></th><th class="c">CONAB</th><th class="g">Gap</th><th class="u">USDA</th></tr>' + sRows.map(r => {
+$('sbsTable').innerHTML = '<tr><th></th><th class="c">CONAB (Brazil)</th><th class="g">Gap</th><th class="u">USDA est. (Brazil)</th></tr>' + sRows.map(r => {
   if (r[0]==='g') return `<tr class="grp"><td colspan="4">${r[1]}</td></tr>`;
-  const [l,c,u] = r, g = (c==null||u==null)?null:c-u;
+  const [l,c,u,crop] = r, g = (c==null||u==null)?null:c-u;
   const w = g==null?0:Math.max(4,Math.abs(g)/maxGap*60);
   const gapTxt = g==null ? '<span class="na">—</span>' :
     `<div class="gapbar"><i style="width:${g<0?w:0}px;background:var(--down)"></i><b style="color:${Number(g.toFixed(2))>0?'var(--up)':Number(g.toFixed(2))<0?'var(--down)':'var(--muted)'}">${Number(g.toFixed(2))===0?'even':sgn(g,2)}</b><i style="width:${g>0?w:0}px;background:var(--up)"></i></div>`;
@@ -618,6 +643,7 @@ function setView(v, push){
   view = v;
   document.querySelectorAll('.switch button').forEach(b => b.setAttribute('aria-selected', b.dataset.view===v));
   document.querySelectorAll('.view').forEach(s => s.classList.toggle('on', s.id==='v-'+v));
+  $('scenCard').style.display = v==='wasde' ? 'none' : '';
   const h = HERO[v]();
   $('hero').className = 'hero ' + h.cls;
   $('heroTitle').textContent = h.title;
